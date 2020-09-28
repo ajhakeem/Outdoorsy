@@ -6,6 +6,10 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.outdoorsy.data.repository.RentalRepository
+import com.example.outdoorsy.domain.MainDomainModel
+import com.example.outdoorsy.extension.setError
+import com.example.outdoorsy.extension.setSuccess
+import com.example.outdoorsy.state.Resource
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
@@ -16,7 +20,7 @@ constructor(
     @Assisted private val savedStateHandle: SavedStateHandle
 ): ViewModel() {
 
-    var liveData = MutableLiveData<String>()
+    var liveData = MutableLiveData<Resource<MainDomainModel>>()
     private val disposable = CompositeDisposable()
 
     fun getListings(queryTerms: String, page: Int, pageOffset: Int) {
@@ -24,9 +28,9 @@ constructor(
             rentalRepository.getListings("", 1, 0)
                 .subscribeOn(Schedulers.io())
                 .subscribe({
-                    println()
+                    liveData.setSuccess(it)
                 }, {
-                    println()
+                    liveData.setError(it.message)
                 })
         )
     }

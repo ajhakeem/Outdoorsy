@@ -3,7 +3,9 @@ package com.example.outdoorsy.domain
 import com.example.outdoorsy.datasource.responsemodels.SearchResponse
 
 data class MainDomainModel(
-    val results: List<RentalDomainModel>
+    val results: List<RentalDomainModel>,
+    var page: Int = 1,
+    var isFirstLoad: Boolean = page == 1
 )
 
 data class RentalDomainModel(
