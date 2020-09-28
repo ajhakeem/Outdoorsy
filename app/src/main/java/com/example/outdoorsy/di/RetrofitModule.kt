@@ -48,7 +48,7 @@ object RetrofitModule {
         rxJava2CallAdapterFactory: RxJava2CallAdapterFactory): Retrofit.Builder {
         return Retrofit.Builder()
             .client(okHttpClient)
-            .baseUrl("https://google.com/")
+            .baseUrl("https://search.outdoorsy.co/")
             .addConverterFactory(gsonConverterFactory)
             .addCallAdapterFactory(rxJava2CallAdapterFactory)
     }

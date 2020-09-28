@@ -23,6 +23,6 @@ class MainActivity : AppCompatActivity() {
             tvText.text = it
         })
 
-        mainViewModel.getListings()
+        mainViewModel.getListings("", 1, 0)
     }
 }
