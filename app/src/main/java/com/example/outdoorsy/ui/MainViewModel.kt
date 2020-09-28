@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import com.example.outdoorsy.data.repository.RentalRepository
 import com.example.outdoorsy.domain.MainDomainModel
 import com.example.outdoorsy.extension.setError
+import com.example.outdoorsy.extension.setLoading
 import com.example.outdoorsy.extension.setSuccess
 import com.example.outdoorsy.state.Resource
 import io.reactivex.disposables.CompositeDisposable
@@ -25,8 +26,9 @@ constructor(
 
     fun getListings(queryTerms: String, page: Int, pageOffset: Int) {
         disposable.add(
-            rentalRepository.getListings("", 1, 0)
+            rentalRepository.getListings(queryTerms, page, pageOffset)
                 .subscribeOn(Schedulers.io())
+                .doOnSubscribe { liveData.setLoading() }
                 .subscribe({
                     liveData.setSuccess(it)
                 }, {

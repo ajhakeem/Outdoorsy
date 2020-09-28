@@ -1,8 +1,13 @@
 package com.example.outdoorsy.ui
 
+import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
+import android.view.Window
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.viewModels
+import androidx.appcompat.widget.SearchView
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.outdoorsy.R
@@ -24,6 +29,7 @@ class MainActivity : AppCompatActivity(), OnBottomReachedListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        supportActionBar?.hide()
         setContentView(R.layout.activity_main)
 
         rvListings.layoutManager = LinearLayoutManager(this)
@@ -34,18 +40,40 @@ class MainActivity : AppCompatActivity(), OnBottomReachedListener {
             updateUI(it)
         })
 
-        mainViewModel.getListings("", 1, 0)
+        if (mainViewModel.liveData.value?.data != null) {
+            layoutEmptyState.gone()
+        }
+
+        svSearch.setOnClickListener{
+            svSearch.isIconified = false
+        }
+
+        svSearch.setOnQueryTextListener(object: SearchView.OnQueryTextListener {
+            override fun onQueryTextChange(newText: String?): Boolean {
+                return false
+            }
+
+            override fun onQueryTextSubmit(query: String?): Boolean {
+                query?.let { s ->
+                    mainViewModel.getListings(s, 1, 0)
+                }
+
+                return false
+            }
+        })
+
     }
 
     private fun updateUI(resource: Resource<MainDomainModel>) {
         when (resource.state) {
             ResourceState.LOADING -> {
                 pbLoading.visible()
-                tvError.gone()
+                layoutErrorState.gone()
+                layoutEmptyState.gone()
             }
             ResourceState.SUCCESS -> {
                 pbLoading.gone()
-                tvError.gone()
+                gSearchResults.visible()
                 resource.data?.let { model ->
                     if (model.isFirstLoad) {
                         listingsAdapter.addItems(model.results)
@@ -56,9 +84,15 @@ class MainActivity : AppCompatActivity(), OnBottomReachedListener {
             }
             ResourceState.ERROR -> {
                 pbLoading.gone()
-                tvError.visible()
+                gSearchResults.gone()
+                layoutErrorState.visible()
             }
         }
+    }
+
+    fun onSearchBarClicked(v : View) {
+        val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.showSoftInput(svSearch, 0)
     }
 
     override fun onBottomReached(pos: Int) {
